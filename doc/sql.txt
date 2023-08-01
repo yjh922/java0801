@@ -1,0 +1,148 @@
+쇼핑몰  shop
+1.기획 
+   - 산출물 : 기획팀 - 스토리보드 
+                개발팀 - ERD
+2.업무분담
+   각 조원: 어떤 라이브러리 적용할지 결정
+              어떤 기술을 적용해야할지 결정 
+              과거에 개발해놓았던 코드가 있는지 조사하고, 있으면 가져옴
+              개발환경 구축해놓음(개발할 준비해놓기)
+3.각각 개발시작 
+   팀장 주도하에, 프로젝트를 최초에 올려놓고, 각 조원들은 해당 프로젝트를
+   자신의 pc에 다운로드 받아 개발함
+
+   Git 기반으로 하되, 반드시 본인만의 branch를 만들어서 개발하기!!
+   본인이 맡은 컨텐츠와 관련된 DB Table에 대한 DTO, DAO 를 주력~~
+
+
+   
+
+org.sp.shop.admin.view.AdminMain
+org.sp.shop.admin.domain.Admin
+org.sp.shop.admin.model.AdminDAO
+
+
+
+
+org.sp.shop.client.view
+
+git에 소스 올려놓았습니다
+
+
+어제 집에서 oracle 테이블 만드신 분들은 강의장에서도 똑같이 만들어야 합니다 
+그리고 작성된 쿼리문은 항상 문서파일로 저장해놓는 습관을 가지셔야 합니다
+오늘은 제가 적어놓겠습니다   (명령어 채팅창에 넣었습니다)
+
+■ system으로 로그인해서 
+create  tablespace  shop
+datafile 'C:\oraclexe\app\oracle\oradata\XE/shop.dbf'  size 5M; 
+
+create  user  shop
+identified by 1234
+default  tablespace shop
+quota  unlimited  on shop;
+
+grant create  table , create sequence , create session to shop; 
+
+■ shop 으로 로그인해서  (  conn  shop/1234  )
+  create  table  admin(
+     admin_idx  number  primary key 
+   , id varchar2(20)
+   , pass varchar2(20)
+   , name varchar2(20)
+);
+create sequence  seq_admin
+increment by 1
+start with 1;
+
+insert into admin(admin_idx, id, pass, name) values(seq_admin.nextval, 'zino','1234','지노');  
+
+create table  topcategory(
+   topcategory_idx  number  primary key 
+ , topname varchar2(30)
+);
+
+create sequence  seq_topcateogy
+increment  by  1
+start with 1;
+
+
+insert into topcategory(topcategory_idx, topname)  values(seq_topcategory.nextval, 'Top');
+insert into topcategory(topcategory_idx, topname)  values(seq_topcategory.nextval, 'Down');
+insert into topcategory(topcategory_idx, topname)  values(seq_topcategory.nextval, 'Accessory');
+insert into topcategory(topcategory_idx, topname)  values(seq_topcategory.nextval, 'Shoes');
+
+
+create  table  subcategory(
+   subcategory_idx  number  primary key 
+  , topcategory_idx  number 
+  , subname varchar2(30)
+  , constraint  fk_topcategory_subcategory  foreign key (topcategory_idx)
+    references  topcategory(topcategory_idx) 
+);
+
+create  sequence  seq_subcategory 
+increment  by  1
+start with 1;
+
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 1 , '가디건');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 1 , '점퍼');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 1 , '니트');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 1 , '티셔츠');
+
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 2 , '청바지');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 2 , '반바지');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 2 , '면바지');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 2 , '스커트');
+
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 3 , '귀걸이');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 3 , '목걸이');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 3 , '반지');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 3 , '시계');
+
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 4 , '운동화');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 4 , '구두');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 4 , '스니커즈');
+insert into subcategory(subcategory_idx, topcategory_idx, subname) values(seq_subcategory.nextval, 4 , '슬리퍼');
+
+
+create   table  product (
+   product_idx  number  primary key 
+ , subcategory_idx  number
+ , product_name varchar2(40)
+ , brand varchar2(30)
+ , price number  default 0 
+ , filename  varchar2(30)              
+ , detail clob 
+ , constraint  fk_subcategory_product  foreign key (subcategory_idx)
+    references  subcategory(subcategory_idx)
+);
+
+create   table   product_size(
+   product_size_idx   number  primary key 
+ , product_idx  number
+ , psize  varchar(10) 
+ , constraint  fk_product_product_size  foreign key(product_idx) 
+   references  product(product_idx)
+);
+
+create  sequence  seq_product_size 
+increment by 1
+start with 1;
+
+create  table  thumb(
+    thumb_idx  number  primary key 
+  , product_idx number 
+  , img  varchar2(30)
+  , constraint  fk_product_thumb  foreign key(product_idx)
+    references  product(product_idx)
+);
+
+create  sequence  seq_thumb
+increment   by  1
+start  with 1;
+
+commit;
+
+select table_name from user_tables;
+select sequence_name from user_sequences;
